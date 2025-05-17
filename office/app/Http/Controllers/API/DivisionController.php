@@ -5,24 +5,28 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Division;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class DivisionController extends Controller
 {
-    // GET /api/divisions
+    // GET /api/v1/divisions
     public function index()
     {
         $divisions = Division::all();
         return response()->json($divisions);
     }
 
-    // POST /api/divisions
+    // POST /api/v1/divisions
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'division_nom'         => 'required|max:255',
-            'division_responsable' => 'required|max:255',
+            'division_responsable' => 'required|max:255|unique:division,division_responsable',
             'password'             => 'required|max:255',
         ]);
+
+        // Hash the password before storing
+        $validatedData['password'] = Hash::make($validatedData['password']);
 
         $division = Division::create($validatedData);
         return response()->json([
@@ -31,20 +35,25 @@ class DivisionController extends Controller
         ], 201);
     }
 
-    // GET /api/divisions/{division}
+    // GET /api/v1/divisions/{division}
     public function show(Division $division)
     {
         return response()->json($division);
     }
 
-    // PUT/PATCH /api/divisions/{division}
+    // PUT/PATCH /api/v1/divisions/{division}
     public function update(Request $request, Division $division)
     {
         $validatedData = $request->validate([
             'division_nom'         => 'required|max:255',
-            'division_responsable' => 'required|max:255',
-            'password'             => 'required|max:255',
+            'division_responsable' => 'required|max:255|unique:division,division_responsable,' . $division->division_id . ',division_id',
+            'password'             => 'sometimes|required|max:255',
         ]);
+
+        // Hash the password if it's being updated
+        if (isset($validatedData['password'])) {
+            $validatedData['password'] = Hash::make($validatedData['password']);
+        }
 
         $division->update($validatedData);
         return response()->json([
@@ -53,7 +62,7 @@ class DivisionController extends Controller
         ]);
     }
 
-    // DELETE /api/divisions/{division}
+    // DELETE /api/v1/divisions/{division}
     public function destroy(Division $division)
     {
         $division->delete();

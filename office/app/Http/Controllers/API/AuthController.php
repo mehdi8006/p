@@ -21,9 +21,13 @@ class AuthController extends Controller
         // Check Admin table first
         $admin = Admin::where('username', $credentials['username'])->first();
         if ($admin) {
-            // Check if password is already hashed
+            // Check if password needs rehashing
             if (Hash::needsRehash($admin->password)) {
-                // Compare plaintext password for now, but note it should be hashed in production
+                // Store the hashed password for future use
+                $admin->password = Hash::make($admin->password);
+                $admin->save();
+                
+                // For this login, compare with the original password
                 if ($credentials['password'] === $admin->password) {
                     return response()->json([
                         'message' => 'Admin login successful',
@@ -34,7 +38,7 @@ class AuthController extends Controller
                     ], 200);
                 }
             } else {
-                // Use proper password verification if it's already hashed
+                // Use proper password verification
                 if (Hash::check($credentials['password'], $admin->password)) {
                     return response()->json([
                         'message' => 'Admin login successful',
@@ -50,26 +54,32 @@ class AuthController extends Controller
         // Check Division table if admin not found
         $division = Division::where('division_responsable', $credentials['username'])->first();
         if ($division) {
-            // Check if password is already hashed
+            // Check if password needs rehashing
             if (Hash::needsRehash($division->password)) {
-                // Compare plaintext password for now
+                // Store the hashed password for future use
+                $division->password = Hash::make($division->password);
+                $division->save();
+                
+                // For this login, compare with the original password
                 if ($credentials['password'] === $division->password) {
                     return response()->json([
                         'message' => 'Division login successful',
                         'user' => [
                             'username' => $division->division_responsable,
-                            'role' => 'division_responsable'
+                            'role' => 'division_responsable',
+                            'division_id' => $division->division_id
                         ]
                     ], 200);
                 }
             } else {
-                // Use proper password verification if it's already hashed
+                // Use proper password verification
                 if (Hash::check($credentials['password'], $division->password)) {
                     return response()->json([
                         'message' => 'Division login successful',
                         'user' => [
                             'username' => $division->division_responsable,
-                            'role' => 'division_responsable'
+                            'role' => 'division_responsable',
+                            'division_id' => $division->division_id
                         ]
                     ], 200);
                 }
