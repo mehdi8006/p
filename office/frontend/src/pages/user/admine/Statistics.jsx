@@ -549,25 +549,7 @@ export default function Statistics() {
                     allowDecimals={false}
                   />
                   <RechartsTooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <Paper 
-                            sx={{ 
-                              p: 1.5,
-                              bgcolor: 'background.paper',
-                              boxShadow: 1,
-                              borderRadius: 1,
-                            }}
-                          >
-                            <Typography variant="body2">
-                              {payload[0].payload.month}: {payload[0].value} tasks
-                            </Typography>
-                          </Paper>
-                        );
-                      }
-                      return null;
-                    }}
+                    content={<CustomTooltip />}
                   />
                   <Bar 
                     dataKey="count" 
@@ -625,26 +607,7 @@ export default function Statistics() {
                     iconType="square"
                   />
                   <RechartsTooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <Paper 
-                            sx={{ 
-                              p: 1.5,
-                              bgcolor: 'background.paper',
-                              boxShadow: 1,
-                              borderRadius: 1,
-                            }}
-                          >
-                            <Typography variant="body2" sx={{ color: data.color }}>
-                              {data.name}: {data.count} tasks ({data.percentage.toFixed(0)}%)
-                            </Typography>
-                          </Paper>
-                        );
-                      }
-                      return null;
-                    }}
+                    content={<CustomTooltip />}
                   />
                 </PieChart>
               </ResponsiveContainer>
