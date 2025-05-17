@@ -57,7 +57,6 @@ export default function Maincontent({ user }) {
           {sidebarCollapsed ? (
             <icontb.TbLayoutSidebarLeftExpand
               size={35}
-              fill="#DDDDDD"
               className="Sidebar"
               onClick={toggleSidebar}
               style={{ cursor: 'pointer' }}
@@ -65,7 +64,6 @@ export default function Maincontent({ user }) {
           ) : (
             <icontb.TbLayoutSidebarLeftCollapse
               size={35}
-              fill="#DDDDDD"
               className="Sidebar"
               onClick={toggleSidebar}
               style={{ cursor: 'pointer' }}
@@ -184,7 +182,7 @@ export default function Maincontent({ user }) {
               <Route path="Taches" element={<AddDivisionTask />} />
               <Route path="Division" element={<AdminDivisions />} />
               <Route path="Statistics" element={<Statistics />} />
-       
+              <Route path="add" element={<Add />} />
               <Route path="HistoryAdmin/:idid_task" element={<Historyadmin />} />
               <Route path="stidivision/:iddiv" element={<Statisticepardivision />} />
               <Route path="Settings" element={<Settings />} />
