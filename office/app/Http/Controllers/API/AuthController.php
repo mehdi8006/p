@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+     public function login(Request $request)
     {
         // Validate the input
         $credentials = $request->validate([
@@ -21,68 +21,31 @@ class AuthController extends Controller
         // Check Admin table first
         $admin = Admin::where('username', $credentials['username'])->first();
         if ($admin) {
-            // Check if password needs rehashing
-            if (Hash::needsRehash($admin->password)) {
-                // Store the hashed password for future use
-                $admin->password = Hash::make($admin->password);
-                $admin->save();
-                
-                // For this login, compare with the original password
-                if ($credentials['password'] === $admin->password) {
-                    return response()->json([
-                        'message' => 'Admin login successful',
-                        'user' => [
-                            'username' => $admin->username,
-                            'role' => 'admin'
-                        ]
-                    ], 200);
-                }
-            } else {
-                // Use proper password verification
-                if (Hash::check($credentials['password'], $admin->password)) {
-                    return response()->json([
-                        'message' => 'Admin login successful',
-                        'user' => [
-                            'username' => $admin->username,
-                            'role' => 'admin'
-                        ]
-                    ], 200);
-                }
+            // Use proper password verification
+            if (Hash::check($credentials['password'], $admin->password)) {
+                return response()->json([
+                    'message' => 'Admin login successful',
+                    'user' => [
+                        'username' => $admin->username,
+                        'role' => 'admin'
+                    ]
+                ], 200);
             }
         }
     
         // Check Division table if admin not found
         $division = Division::where('division_responsable', $credentials['username'])->first();
         if ($division) {
-            // Check if password needs rehashing
-            if (Hash::needsRehash($division->password)) {
-                // Store the hashed password for future use
-                $division->password = Hash::make($division->password);
-                $division->save();
-                
-                // For this login, compare with the original password
-                if ($credentials['password'] === $division->password) {
-                    return response()->json([
-                        'message' => 'Division login successful',
-                        'user' => [
-                            'username' => $division->division_responsable,
-                            'role' => 'division_responsable',
-                            'division_id' => $division->division_id
-                        ]
-                    ], 200);
-                }
-            } else {
-                // Use proper password verification
-                if (Hash::check($credentials['password'], $division->password)) {
-                    return response()->json([
-                        'message' => 'Division login successful',
-                        'user' => [
-                            'username' => $division->division_responsable,
-                            'role' => 'division_responsable',
-                            'division_id' => $division->division_id
-                        ]
-                    ], 200);
-                }
+            // Use proper password verification
+            if (Hash::check($credentials['password'], $division->password)) {
+                return response()->json([
+                    'message' => 'Division login successful',
+                    'user' => [
+                        'username' => $division->division_responsable,
+                        'role' => 'division_responsable',
+                        'division_id' => $division->division_id
+                    ]
+                ], 200);
             }
         }
     
@@ -99,7 +62,7 @@ class AuthController extends Controller
         $admins = Admin::all();
         foreach ($admins as $admin) {
             // Check if the password is plain-text and rehash it
-            if (Hash::needsRehash($admin->password)) {
+            if (!Hash::info($admin->password)['algo']) {
                 $admin->password = Hash::make($admin->password); // Hash the password
                 $admin->save();
             }
@@ -109,7 +72,7 @@ class AuthController extends Controller
         $divisions = Division::all();
         foreach ($divisions as $division) {
             // Check if the password is plain-text and rehash it
-            if (Hash::needsRehash($division->password)) {
+            if (!Hash::info($division->password)['algo']) {
                 $division->password = Hash::make($division->password); // Hash the password
                 $division->save();
             }
@@ -119,4 +82,6 @@ class AuthController extends Controller
             'message' => 'Passwords have been rehashed where needed.'
         ], 200);
     }
+    
+    // Method to securely rehash passwords
 }

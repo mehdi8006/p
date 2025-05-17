@@ -10,6 +10,9 @@ use App\Http\Controllers\API\HistoriqueController;
 use App\Http\Controllers\API\StatusController;
 use App\Http\Controllers\API\TaskController;
 
+// Public routes (no auth required)
+Route::post('/login', [AuthController::class, 'login']);
+
 // API v1 Routes
 Route::prefix('v1')->group(function () {
     // Auth routes
@@ -34,9 +37,6 @@ Route::prefix('v1')->group(function () {
     // History routes
     Route::apiResource('historiques', HistoriqueController::class);
 });
-
-// Public routes (without auth)
-Route::post('/api/login', [AuthController::class, 'login']);
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {

@@ -9,13 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class HistoriqueController extends Controller
 {
-    // GET /api/v1/historiques
-    public function index()
-    {
-        $historiques = Historique::all();
-        return response()->json($historiques);
-    }
-
+    
     // POST /api/v1/historiques
     public function store(Request $request) {
         // Validate the request
@@ -26,6 +20,9 @@ class HistoriqueController extends Controller
             'dochistorique_path' => 'required|file|mimes:pdf,doc,docx,txt',
         ]);
     
+        // Ensure the historiques directory exists
+        Storage::disk('public')->makeDirectory('historiques');
+        
         // Store the file and get the path
         $filePath = $request->file('dochistorique_path')->store('historiques', 'public');
     
@@ -43,6 +40,8 @@ class HistoriqueController extends Controller
         ], 201);
     }
 
+    // POST /api/v1/historiques
+   
     // GET /api/v1/historiques/{historique}
     public function show(Historique $historique)
     {

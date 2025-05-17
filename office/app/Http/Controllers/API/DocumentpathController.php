@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class DocumentpathController extends Controller
 {
     // GET /api/v1/documentpaths
+     // GET /api/v1/documentpaths
     public function index()
     {
         $documentpaths = Documentpath::all();
@@ -27,6 +28,9 @@ class DocumentpathController extends Controller
         
         if ($request->hasFile('document_path')) {
             $file = $request->file('document_path');
+            
+            // Ensure the uploads directory exists
+            Storage::disk('public')->makeDirectory('uploads');
             
             // Save to the 'public' disk under 'uploads' directory
             $path = $file->store('uploads', 'public');

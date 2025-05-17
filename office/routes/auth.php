@@ -24,9 +24,18 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.store');
 
+// Fix the problematic route - either specify a method or comment it out if not used
+// If the controller has a __invoke method, use:
+Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+    ->middleware(['auth', 'signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+// If the controller doesn't exist or you don't need this route, comment it out:
+/*
 Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['auth', 'signed', 'throttle:6,1'])
     ->name('verification.verify');
+*/
 
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
     ->middleware(['auth', 'throttle:6,1'])

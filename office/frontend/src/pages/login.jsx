@@ -16,10 +16,12 @@ const LoginPage = ({ setUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
   
     try {
       const res = await axios.post('http://127.0.0.1:8000/api/login', {
@@ -28,12 +30,20 @@ const LoginPage = ({ setUser }) => {
       });
   
       const user = res.data.user;
-      const { username: userName, role ,division_id } = user;
-  
-      setUser({ username: userName, role ,division_id });
-      navigate('/app');
+      if (user) {
+        const { username: userName, role, division_id } = user;
+        // Store user data in localStorage for persistence
+        localStorage.setItem('user', JSON.stringify({ username: userName, role, division_id }));
+        setUser({ username: userName, role, division_id });
+        navigate('/app');
+      } else {
+        setError('Invalid response from server');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -60,6 +70,7 @@ const LoginPage = ({ setUser }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              disabled={loading}
             />
             <TextField
               label="Mot de passe"
@@ -69,9 +80,16 @@ const LoginPage = ({ setUser }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
-              Se connecter
+            <Button 
+              type="submit" 
+              fullWidth 
+              variant="contained" 
+              sx={{ mt: 2 }}
+              disabled={loading}
+            >
+              {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
           
